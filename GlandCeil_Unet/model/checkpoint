@@ -1,0 +1,2 @@
+model_checkpoint_path: "D:\\Project\\python\\GlandCeil_Unet\\model\\unet2dglandceil.pd"
+all_model_checkpoint_paths: "D:\\Project\\python\\GlandCeil_Unet\\model\\unet2dglandceil.pd"
