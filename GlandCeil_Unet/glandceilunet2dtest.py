@@ -10,8 +10,8 @@ def train():
     Preprocessing for dataset
     '''
     # Read  data set (Train data from CSV file)
-    csvmaskdata = pd.read_csv('D:\Project\python\GlandCeil_Unet/GlandsMask.csv')
-    csvimagedata = pd.read_csv('D:\Project\python\GlandCeil_Unet/GlandsImage.csv')
+    csvmaskdata = pd.read_csv('D:\Segment/GlandsMask.csv')
+    csvimagedata = pd.read_csv('D:\Segment/GlandsImage.csv')
     maskdata = csvmaskdata.iloc[:, :].values
     imagedata = csvimagedata.iloc[:, :].values
     # shuffle imagedata and maskdata together
@@ -26,7 +26,7 @@ def train():
 
 
 def predict():
-    true_img = cv2.imread("D:\Data\GlandCeil\Test\Image\\testA_55.bmp", cv2.IMREAD_COLOR)
+    true_img = cv2.imread("D:\Data\GlandCeil\Test\Image\\testA_31.bmp", cv2.IMREAD_COLOR)
     test_images = true_img.astype(np.float)
     # convert from [0:255] => [0.0:1.0]
     test_images = np.multiply(test_images, 1.0 / 255.0)
@@ -44,4 +44,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(2)
+    main(1)
