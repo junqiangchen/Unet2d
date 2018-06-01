@@ -1,7 +1,8 @@
 '''
-author:junqiangchen,time:2018.5.19
+
 '''
-from unet2d.layer import (conv2d, deconv2d, max_pool_2x2, crop_and_concat, weight_xavier_init, bias_variable)
+from unet2d.layer import (conv2d, deconv2d, max_pool_2x2, crop_and_concat, weight_xavier_init, bias_variable,
+                          normalize_staining)
 import tensorflow as tf
 import numpy as np
 import cv2
@@ -14,12 +15,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W1_1 = weight_xavier_init(shape=[3, 3, image_channel, 32], n_inputs=3 * 3 * image_channel, n_outputs=32)
     B1_1 = bias_variable([32])
     conv1_1 = conv2d(inputX, W1_1) + B1_1
+    # conv1_1 = tf.contrib.layers.batch_norm(conv1_1, epsilon=1e-5, scope='bn1')
     conv1_1 = tf.contrib.layers.batch_norm(conv1_1, center=True, scale=True, is_training=phase, scope='bn1')
     conv1_1 = tf.nn.dropout(tf.nn.relu(conv1_1), drop_conv)
 
     W1_2 = weight_xavier_init(shape=[3, 3, 32, 32], n_inputs=3 * 3 * 32, n_outputs=32)
     B1_2 = bias_variable([32])
     conv1_2 = conv2d(conv1_1, W1_2) + B1_2
+    # conv1_2 = tf.contrib.layers.batch_norm(conv1_2, epsilon=1e-5, scope='bn2')
     conv1_2 = tf.contrib.layers.batch_norm(conv1_2, center=True, scale=True, is_training=phase, scope='bn2')
     conv1_2 = tf.nn.dropout(tf.nn.relu(conv1_2), drop_conv)
 
@@ -28,12 +31,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W2_1 = weight_xavier_init(shape=[3, 3, 32, 64], n_inputs=3 * 3 * 32, n_outputs=64)
     B2_1 = bias_variable([64])
     conv2_1 = conv2d(pool1, W2_1) + B2_1
+    # conv2_1 = tf.contrib.layers.batch_norm(conv2_1, epsilon=1e-5, scope='bn3')
     conv2_1 = tf.contrib.layers.batch_norm(conv2_1, center=True, scale=True, is_training=phase, scope='bn3')
     conv2_1 = tf.nn.dropout(tf.nn.relu(conv2_1), drop_conv)
 
     W2_2 = weight_xavier_init(shape=[3, 3, 64, 64], n_inputs=3 * 3 * 64, n_outputs=64)
     B2_2 = bias_variable([64])
     conv2_2 = conv2d(conv2_1, W2_2) + B2_2
+    # conv2_2 = tf.contrib.layers.batch_norm(conv2_2, epsilon=1e-5, scope='bn4')
     conv2_2 = tf.contrib.layers.batch_norm(conv2_2, center=True, scale=True, is_training=phase, scope='bn4')
     conv2_2 = tf.nn.dropout(tf.nn.relu(conv2_2), drop_conv)
 
@@ -43,12 +48,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W3_1 = weight_xavier_init(shape=[3, 3, 64, 128], n_inputs=3 * 3 * 64, n_outputs=128)
     B3_1 = bias_variable([128])
     conv3_1 = conv2d(pool2, W3_1) + B3_1
+    # conv3_1 = tf.contrib.layers.batch_norm(conv3_1, epsilon=1e-5, scope='bn5')
     conv3_1 = tf.contrib.layers.batch_norm(conv3_1, center=True, scale=True, is_training=phase, scope='bn5')
     conv3_1 = tf.nn.dropout(tf.nn.relu(conv3_1), drop_conv)
 
     W3_2 = weight_xavier_init(shape=[3, 3, 128, 128], n_inputs=3 * 3 * 128, n_outputs=128)
     B3_2 = bias_variable([128])
     conv3_2 = conv2d(conv3_1, W3_2) + B3_2
+    # conv3_2 = tf.contrib.layers.batch_norm(conv3_2, epsilon=1e-5, scope='bn6')
     conv3_2 = tf.contrib.layers.batch_norm(conv3_2, center=True, scale=True, is_training=phase, scope='bn6')
     conv3_2 = tf.nn.dropout(tf.nn.relu(conv3_2), drop_conv)
 
@@ -58,12 +65,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W4_1 = weight_xavier_init(shape=[3, 3, 128, 256], n_inputs=3 * 3 * 128, n_outputs=256)
     B4_1 = bias_variable([256])
     conv4_1 = conv2d(pool3, W4_1) + B4_1
+    # conv4_1 = tf.contrib.layers.batch_norm(conv4_1, epsilon=1e-5, scope='bn7')
     conv4_1 = tf.contrib.layers.batch_norm(conv4_1, center=True, scale=True, is_training=phase, scope='bn7')
     conv4_1 = tf.nn.dropout(tf.nn.relu(conv4_1), drop_conv)
 
     W4_2 = weight_xavier_init(shape=[3, 3, 256, 256], n_inputs=3 * 3 * 256, n_outputs=256)
     B4_2 = bias_variable([256])
     conv4_2 = conv2d(conv4_1, W4_2) + B4_2
+    # conv4_2 = tf.contrib.layers.batch_norm(conv4_2, epsilon=1e-5, scope='bn8')
     conv4_2 = tf.contrib.layers.batch_norm(conv4_2, center=True, scale=True, is_training=phase, scope='bn8')
     conv4_2 = tf.nn.dropout(tf.nn.relu(conv4_2), drop_conv)
 
@@ -73,12 +82,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W5_1 = weight_xavier_init(shape=[3, 3, 256, 512], n_inputs=3 * 3 * 256, n_outputs=512)
     B5_1 = bias_variable([512])
     conv5_1 = conv2d(pool4, W5_1) + B5_1
+    # conv5_1 = tf.contrib.layers.batch_norm(conv5_1, epsilon=1e-5, scope='bn9')
     conv5_1 = tf.contrib.layers.batch_norm(conv5_1, center=True, scale=True, is_training=phase, scope='bn9')
     conv5_1 = tf.nn.dropout(tf.nn.relu(conv5_1), drop_conv)
 
     W5_2 = weight_xavier_init(shape=[3, 3, 512, 512], n_inputs=3 * 3 * 512, n_outputs=512)
     B5_2 = bias_variable([512])
     conv5_2 = conv2d(conv5_1, W5_2) + B5_2
+    # conv5_2 = tf.contrib.layers.batch_norm(conv5_2, epsilon=1e-5, scope='bn10')
     conv5_2 = tf.contrib.layers.batch_norm(conv5_2, center=True, scale=True, is_training=phase, scope='bn10')
     conv5_2 = tf.nn.dropout(tf.nn.relu(conv5_2), drop_conv)
 
@@ -92,12 +103,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W7_1 = weight_xavier_init(shape=[3, 3, 512, 256], n_inputs=3 * 3 * 512, n_outputs=256)
     B7_1 = bias_variable([256])
     conv7_1 = conv2d(dconv_concat1, W7_1) + B7_1
+    # conv7_1 = tf.contrib.layers.batch_norm(conv7_1, epsilon=1e-5, scope='bn11')
     conv7_1 = tf.contrib.layers.batch_norm(conv7_1, center=True, scale=True, is_training=phase, scope='bn11')
     conv7_1 = tf.nn.dropout(tf.nn.relu(conv7_1), drop_conv)
 
     W7_2 = weight_xavier_init(shape=[3, 3, 256, 256], n_inputs=3 * 3 * 256, n_outputs=256)
     B7_2 = bias_variable([256])
     conv7_2 = conv2d(conv7_1, W7_2) + B7_2
+    # conv7_2 = tf.contrib.layers.batch_norm(conv7_2, epsilon=1e-5, scope='bn12')
     conv7_2 = tf.contrib.layers.batch_norm(conv7_2, center=True, scale=True, is_training=phase, scope='bn12')
     conv7_2 = tf.nn.dropout(tf.nn.relu(conv7_2), drop_conv)
 
@@ -111,12 +124,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W9_1 = weight_xavier_init(shape=[3, 3, 256, 128], n_inputs=3 * 3 * 256, n_outputs=128)
     B9_1 = bias_variable([128])
     conv9_1 = conv2d(dconv_concat2, W9_1) + B9_1
+    # conv9_1 = tf.contrib.layers.batch_norm(conv9_1, epsilon=1e-5, scope='bn13')
     conv9_1 = tf.contrib.layers.batch_norm(conv9_1, center=True, scale=True, is_training=phase, scope='bn13')
     conv9_1 = tf.nn.dropout(tf.nn.relu(conv9_1), drop_conv)
 
     W9_2 = weight_xavier_init(shape=[3, 3, 128, 128], n_inputs=3 * 3 * 128, n_outputs=128)
     B9_2 = bias_variable([128])
     conv9_2 = conv2d(conv9_1, W9_2) + B9_2
+    # conv9_2 = tf.contrib.layers.batch_norm(conv9_2, epsilon=1e-5, scope='bn14')
     conv9_2 = tf.contrib.layers.batch_norm(conv9_2, center=True, scale=True, is_training=phase, scope='bn14')
     conv9_2 = tf.nn.dropout(tf.nn.relu(conv9_2), drop_conv)
 
@@ -130,12 +145,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W11_1 = weight_xavier_init(shape=[3, 3, 128, 64], n_inputs=3 * 3 * 128, n_outputs=64)
     B11_1 = bias_variable([64])
     conv11_1 = conv2d(dconv_concat3, W11_1) + B11_1
+    # conv11_1 = tf.contrib.layers.batch_norm(conv11_1, epsilon=1e-5, scope='bn15')
     conv11_1 = tf.contrib.layers.batch_norm(conv11_1, center=True, scale=True, is_training=phase, scope='bn15')
     conv11_1 = tf.nn.dropout(tf.nn.relu(conv11_1), drop_conv)
 
     W11_2 = weight_xavier_init(shape=[3, 3, 64, 64], n_inputs=3 * 3 * 64, n_outputs=64)
     B11_2 = bias_variable([64])
     conv11_2 = conv2d(conv11_1, W11_2) + B11_2
+    # conv11_2 = tf.contrib.layers.batch_norm(conv11_2, epsilon=1e-5, scope='bn16')
     conv11_2 = tf.contrib.layers.batch_norm(conv11_2, center=True, scale=True, is_training=phase, scope='bn16')
     conv11_2 = tf.nn.dropout(tf.nn.relu(conv11_2), drop_conv)
 
@@ -149,12 +166,14 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     W13_1 = weight_xavier_init(shape=[3, 3, 64, 32], n_inputs=3 * 3 * 64, n_outputs=32)
     B13_1 = bias_variable([32])
     conv13_1 = conv2d(dconv_concat4, W13_1) + B13_1
+    # conv13_1 = tf.contrib.layers.batch_norm(conv13_1, epsilon=1e-5, scope='bn17')
     conv13_1 = tf.contrib.layers.batch_norm(conv13_1, center=True, scale=True, is_training=phase, scope='bn17')
     conv13_1 = tf.nn.dropout(tf.nn.relu(conv13_1), drop_conv)
 
     W13_2 = weight_xavier_init(shape=[3, 3, 32, 32], n_inputs=3 * 3 * 32, n_outputs=32)
     B13_2 = bias_variable([32])
     conv13_2 = conv2d(conv13_1, W13_2) + B13_2
+    # conv13_2 = tf.contrib.layers.batch_norm(conv13_2, epsilon=1e-5, scope='bn18')
     conv13_2 = tf.contrib.layers.batch_norm(conv13_2, center=True, scale=True, is_training=phase, scope='bn18')
     conv13_2 = tf.nn.dropout(tf.nn.relu(conv13_2), drop_conv)
     # layer14->output
@@ -221,6 +240,11 @@ class unet2dModule(object):
             intersection = 2 * tf.reduce_sum(pred_flat * true_flat, axis=1) + smooth
             denominator = tf.reduce_sum(pred_flat, axis=1) + tf.reduce_sum(true_flat, axis=1) + smooth
             loss = -tf.reduce_mean(intersection / denominator)
+        if cost_name == "pixelwise_cross entroy":
+            assert (C == 1)
+            flat_logit = tf.reshape(self.Y_pred, [-1])
+            flat_label = tf.reshape(self.Y_gt, [-1])
+            loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=flat_logit, labels=flat_label))
         return loss
 
     def train(self, train_images, train_lanbels, model_path, logs_path, learning_rate,
@@ -236,6 +260,7 @@ class unet2dModule(object):
         sess = tf.InteractiveSession(config=tf.ConfigProto(allow_soft_placement=True))
         summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
         sess.run(init)
+        saver.restore(sess, model_path)
 
         DISPLAY_STEP = 1
         index_in_epoch = 0
@@ -249,7 +274,9 @@ class unet2dModule(object):
 
             for num in range(len(batch_xs_path)):
                 image = cv2.imread(batch_xs_path[num][0], cv2.IMREAD_COLOR)
+                # cv2.imwrite('image_src.bmp', image)
                 label = cv2.imread(batch_ys_path[num][0], cv2.IMREAD_GRAYSCALE)
+                # cv2.imwrite('mask.bmp', label)
                 batch_xs[num, :, :, :] = np.reshape(image, (self.image_height, self.image_with, self.channels))
                 batch_ys[num, :, :, :] = np.reshape(label, (self.image_height, self.image_with, 1))
             # Extracting images and labels from given data
@@ -265,9 +292,18 @@ class unet2dModule(object):
                                                                                              self.lr: learning_rate,
                                                                                              self.phase: 1,
                                                                                              self.drop_conv: dropout_conv})
+                pred = sess.run(self.Y_pred, feed_dict={self.X: batch_xs,
+                                                        self.Y_gt: batch_ys,
+                                                        self.phase: 1,
+                                                        self.drop_conv: 1})
+                result = np.reshape(pred[0], (512, 512))
+                result = result.astype(np.float32) * 255.
+                result = np.clip(result, 0, 255).astype('uint8')
+                cv2.imwrite("result.bmp", result)
                 print('epochs %d training_loss ,Training_accuracy => %.5f,%.5f ' % (i, train_loss, train_accuracy))
                 if i % (DISPLAY_STEP * 10) == 0 and i:
                     DISPLAY_STEP *= 10
+
                     # train on batch
             _, summary = sess.run([train_op, merged_summary_op], feed_dict={self.X: batch_xs,
                                                                             self.Y_gt: batch_ys,
@@ -288,6 +324,9 @@ class unet2dModule(object):
         saver.restore(sess, model_path)
 
         test_images = np.reshape(test_images, (1, test_images.shape[0], test_images.shape[1], self.channels))
+        # test_label = cv2.imread("D:\Data\GlandCeil\Test\Mask\\train_37_anno.bmp", 0)
+        # test_label = np.multiply(test_label, 1.0 / 255.0)
+        # test_label = np.reshape(test_label, (1, test_label.shape[0], test_label.shape[1], 1))
         pred = sess.run(self.Y_pred, feed_dict={self.X: test_images,
                                                 self.phase: 1,
                                                 self.drop_conv: 1})
