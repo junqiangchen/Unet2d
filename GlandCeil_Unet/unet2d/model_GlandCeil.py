@@ -177,7 +177,7 @@ def _create_conv_net(X, image_width, image_height, image_channel, phase, drop_co
     conv13_2 = tf.contrib.layers.batch_norm(conv13_2, center=True, scale=True, is_training=phase, scope='bn18')
     conv13_2 = tf.nn.dropout(tf.nn.relu(conv13_2), drop_conv)
     # layer14->output
-    W14 = weight_xavier_init(shape=[1, 1, 32, n_class], n_inputs=1 * 1 * 32, n_outputs=1)
+    W14 = weight_xavier_init(shape=[1, 1, 32, n_class], n_inputs=1 * 1 * 32, n_outputs=n_class)
     B14 = bias_variable([n_class])
     output_map = tf.nn.sigmoid(conv2d(conv13_2, W14) + B14, name='output')
 
