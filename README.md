@@ -8,6 +8,7 @@ the image files path is in the csv files,and put the image on the path,use the g
 training the model on the GTX1080,it take 20 hours,and i also attach the trained model in the project,you also just use the glandceilunet2dtest.py file to predict,and get the segmentation result.
 
 download trained model : https://pan.baidu.com/s/1UNNQlwM0wS-QmO4Anm5Rrw passport: gvjq
+
 ![](header.png)
 
 ## Contact
