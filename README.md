@@ -9,7 +9,13 @@ training the model on the GTX1080,it take 20 hours,and i also attach the trained
 
 download trained model : https://pan.baidu.com/s/1UNNQlwM0wS-QmO4Anm5Rrw passport: gvjq
 
-![](header.png)
+## Result
+
+![](1.PNG)
+
+![](2.PNG)
+
+![](3.PNG)
 
 ## Contact
 * https://github.com/junqiangchen
