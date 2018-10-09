@@ -1,7 +1,7 @@
 '''
 
 '''
-from unet2d.layer import (conv2d, deconv2d, max_pool_2x2, crop_and_concat, weight_xavier_init, bias_variable,
+from GlandCeil_Unet.unet2d.layer import (conv2d, deconv2d, max_pool_2x2, crop_and_concat, weight_xavier_init, bias_variable,
                           normalize_staining)
 import tensorflow as tf
 import numpy as np
