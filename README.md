@@ -3,9 +3,9 @@
 
 ## How to Use
 
-the image files path is in the csv files,and put the image on the path,use the glandceilunet2dtest.py file train the model. 
+The image files path is in the csv files, and put the image on the path, use the `glandceilunet2dtest.py` file to train the model. 
 
-training the model on the GTX1080,it take 20 hours,and i also attach the trained model in the project,you also just use the glandceilunet2dtest.py file to predict,and get the segmentation result.
+Training the model on the GTX1080, it take 20 hours, and i also attach the trained model in the project, you also just use the `glandceilunet2dtest.py` file to predict, and get the segmentation result.
 
 download trained model : https://pan.baidu.com/s/17p5lNKSNfWvFtn1KujjVbQ passport: hto4
 
