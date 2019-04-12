@@ -4,6 +4,7 @@
 from GlandCeil_Unet.unet2d.layer import (conv2d, deconv2d, max_pool_2x2, crop_and_concat, weight_xavier_init, bias_variable)
 import tensorflow as tf
 import numpy as np
+import os
 import cv2
 
 
@@ -259,7 +260,8 @@ class unet2dModule(object):
         sess = tf.InteractiveSession(config=tf.ConfigProto(allow_soft_placement=True))
         summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
         sess.run(init)
-        saver.restore(sess, model_path)
+        if os.path.isfile(model_path):
+            saver.restore(sess, model_path)
 
         DISPLAY_STEP = 1
         index_in_epoch = 0
