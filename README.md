@@ -1,6 +1,15 @@
 # ImageSegmentation With Unet2d
 > This is an example of Medical Image Ceil Segment
 
+## Prerequisities
+The following dependencies are needed:
+- numpy >= 1.11.1
+- SimpleITK >=1.0.1
+- opencv-python >=3.3.0
+- tensorflow-gpu ==1.8.0
+- pandas >=0.20.1
+- scikit-learn >= 0.17.1
+
 ## How to Use
 
 The image files path is in the csv files, and put the image on the path, use the `glandceilunet2dtest.py` file to train the model. 
